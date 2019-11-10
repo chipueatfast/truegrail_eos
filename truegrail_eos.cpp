@@ -11,6 +11,25 @@ namespace eosio {
             };
 
             [[eosio::action]]
+            void clearusers() {
+                require_auth(get_self());
+                users storage(get_self(), get_self().value);
+                auto it = storage.begin();
+                while (it != storage.end()) {
+                    it = storage.erase(it);
+                };
+            }
+
+            [[eosio::action]]
+            void eraseuser(uint64_t user_id) {
+                require_auth(get_self());
+                users storage(get_self(), get_self().value);
+                auto existing = storage.find(user_id);
+                check(existing != storage.end(), "Record does not exist");
+                storage.erase(existing);
+            }
+
+            [[eosio::action]]
             void upsertuser(uint64_t user_id, string user_info_hash) {
                 require_auth(get_self());
                 users storage(get_self(), get_self().value);

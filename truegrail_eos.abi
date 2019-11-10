@@ -4,6 +4,21 @@
     "types": [],
     "structs": [
         {
+            "name": "clearusers",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "eraseuser",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "history",
             "base": "",
             "fields": [
@@ -103,6 +118,16 @@
         }
     ],
     "actions": [
+        {
+            "name": "clearusers",
+            "type": "clearusers",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "eraseuser",
+            "type": "eraseuser",
+            "ricardian_contract": ""
+        },
         {
             "name": "issue",
             "type": "issue",
