@@ -11,6 +11,23 @@ namespace eosio {
             };
 
             [[eosio::action]]
+            void upsertuser(uint64_t user_id, string user_info_hash) {
+                require_auth(get_self());
+                users storage(get_self(), get_self().value);
+                auto existing = storage.find(user_id);
+                if (existing == storage.end()) {
+                    storage.emplace(get_self(), [&](auto& row) {
+                        row.id = user_id;
+                        row.info_hash = user_info_hash;
+                    });
+                } else {
+                    storage.modify(existing, get_self(), [&](auto& row) {
+                        row.info_hash = user_info_hash;
+                    });
+                };
+            }
+
+            [[eosio::action]]
             void issue(uint64_t sneaker_id, string sneaker_info_hash) {
                 require_auth(get_self());
                 ownerships storage(get_self(), get_self().value);
@@ -41,9 +58,13 @@ namespace eosio {
 
 
         private:
-            struct user {
+            struct [[eosio::table]] user {
                 uint64_t id;
                 string info_hash;
+
+                uint64_t primary_key()const {
+                    return id;
+                }
             };
 
             struct sneaker {
@@ -68,6 +89,7 @@ namespace eosio {
                 };
             };
 
+            typedef multi_index<"users"_n, user> users;
             typedef multi_index<"ownerships"_n, ownership> ownerships;
     };
 }

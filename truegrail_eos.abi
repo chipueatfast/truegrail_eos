@@ -74,6 +74,20 @@
             ]
         },
         {
+            "name": "upsertuser",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "user_info_hash",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "user",
             "base": "",
             "fields": [
@@ -98,6 +112,11 @@
             "name": "transfer",
             "type": "transfer",
             "ricardian_contract": ""
+        },
+        {
+            "name": "upsertuser",
+            "type": "upsertuser",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -111,6 +130,13 @@
         {
             "name": "ownerships",
             "type": "ownership",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "users",
+            "type": "user",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
