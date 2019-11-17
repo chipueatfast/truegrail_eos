@@ -7,11 +7,21 @@ namespace eosio {
 
     class [[eosio::contract("truegrail_eos")]] truegrail_eos: public contract {
         public:
-            truegrail_eos(name code, name receiver, datastream<const char*> ds): contract(code, receiver, ds) {
+            truegrail_eos(name self, name receiver, datastream<const char*> ds): contract(self, receiver, ds) {
             };
 
             [[eosio::action]]
             void clearusers() {
+                require_auth(get_self());
+                users storage(get_self(), get_self().value);
+                auto it = storage.begin();
+                while (it != storage.end()) {
+                    it = storage.erase(it);
+                };
+            }
+
+            [[eosio::action]]
+            void clearsneak() {
                 require_auth(get_self());
                 users storage(get_self(), get_self().value);
                 auto it = storage.begin();
@@ -27,6 +37,24 @@ namespace eosio {
                 auto existing = storage.find(user_id);
                 check(existing != storage.end(), "Record does not exist");
                 storage.erase(existing);
+            }
+
+            [[eosio::action]]
+            void insertuser(uint64_t user_id, string user_info_hash, string role) {
+                require_auth(get_self());
+                users storage(get_self(), get_self().value);
+                auto existing = storage.find(user_id);
+                check(existing == storage.end(), "This credential has already been registered");
+                storage.emplace(get_self(), [&](auto& row) {
+                    row.id = user_id;
+                    row.info_hash = user_info_hash;
+                    row.role = role;
+                });
+            }
+
+            [[eosio::action]]
+            void updateuser(name user, uint64_t user_id, string user_info_hash) {
+                require_auth(user);
             }
 
             [[eosio::action]]
@@ -59,6 +87,7 @@ namespace eosio {
                 });
             };
 
+
             [[eosio::action]]
             void transfer(uint64_t sneaker_id, uint64_t user_id, string user_info_hash) {
                 require_auth(get_self());
@@ -77,9 +106,11 @@ namespace eosio {
 
 
         private:
+
             struct [[eosio::table]] user {
                 uint64_t id;
                 string info_hash;
+                string role;
 
                 uint64_t primary_key()const {
                     return id;
