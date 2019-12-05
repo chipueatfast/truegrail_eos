@@ -4,6 +4,25 @@
     "types": [],
     "structs": [
         {
+            "name": "checkcreator",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "checkfactory",
+            "base": "",
+            "fields": [
+                {
+                    "name": "factory",
+                    "type": "name"
+                },
+                {
+                    "name": "factory_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "clearsneak",
             "base": "",
             "fields": []
@@ -42,7 +61,15 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "eos_name",
+                    "type": "name"
+                },
+                {
                     "name": "user_info_hash",
+                    "type": "string"
+                },
+                {
+                    "name": "role",
                     "type": "string"
                 }
             ]
@@ -51,6 +78,18 @@
             "name": "issue",
             "base": "",
             "fields": [
+                {
+                    "name": "factory",
+                    "type": "name"
+                },
+                {
+                    "name": "factory_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "toclaim",
+                    "type": "name"
+                },
                 {
                     "name": "sneaker_id",
                     "type": "uint64"
@@ -86,23 +125,17 @@
                 {
                     "name": "info_hash",
                     "type": "string"
-                }
-            ]
-        },
-        {
-            "name": "transfer",
-            "base": "",
-            "fields": [
+                },
                 {
-                    "name": "sneaker_id",
+                    "name": "owner_id",
                     "type": "uint64"
                 },
                 {
-                    "name": "user_id",
-                    "type": "uint64"
+                    "name": "owner",
+                    "type": "name"
                 },
                 {
-                    "name": "user_info_hash",
+                    "name": "status",
                     "type": "string"
                 }
             ]
@@ -126,26 +159,16 @@
             ]
         },
         {
-            "name": "upsertuser",
-            "base": "",
-            "fields": [
-                {
-                    "name": "user_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "user_info_hash",
-                    "type": "string"
-                }
-            ]
-        },
-        {
             "name": "user",
             "base": "",
             "fields": [
                 {
                     "name": "id",
                     "type": "uint64"
+                },
+                {
+                    "name": "eos_name",
+                    "type": "name"
                 },
                 {
                     "name": "info_hash",
@@ -159,6 +182,16 @@
         }
     ],
     "actions": [
+        {
+            "name": "checkcreator",
+            "type": "checkcreator",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "checkfactory",
+            "type": "checkfactory",
+            "ricardian_contract": ""
+        },
         {
             "name": "clearsneak",
             "type": "clearsneak",
@@ -185,18 +218,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "transfer",
-            "type": "transfer",
-            "ricardian_contract": ""
-        },
-        {
             "name": "updateuser",
             "type": "updateuser",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "upsertuser",
-            "type": "upsertuser",
             "ricardian_contract": ""
         }
     ],
@@ -209,8 +232,15 @@
             "key_types": []
         },
         {
-            "name": "ownerships",
+            "name": "ownership",
             "type": "ownership",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "sneakers",
+            "type": "sneaker",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
