@@ -141,6 +141,20 @@
             ]
         },
         {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sneaker_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "new_owner_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "updateuser",
             "base": "",
             "fields": [
@@ -215,6 +229,11 @@
         {
             "name": "issue",
             "type": "issue",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
             "ricardian_contract": ""
         },
         {

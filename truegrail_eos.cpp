@@ -29,7 +29,7 @@ namespace eosio {
             [[eosio::action]]
             void clearsneak() {
                 require_auth(get_self());
-                users storage(get_self(), get_self().value);
+                sneakers storage(get_self(), get_self().value);
                 auto it = storage.begin();
                 while (it != storage.end()) {
                     it = storage.erase(it);
@@ -97,21 +97,22 @@ namespace eosio {
             };
 
 
-            // [[eosio::action]]
-            // void transfer(uint64_t sneaker_id, uint64_t user_id, string user_info_hash) {
-            //     require_auth(get_self());
-            //     ownerships storage(get_self(), get_self().value);
-            //     auto existing = storage.find(sneaker_id);
-            //     check(existing != storage.end(), "sneaker does not exist!");
-            //     storage.modify(existing, get_self(), [&] (auto& row) {
-            //         row.sneaker = existing -> sneaker;
-            //         struct user new_owner = {
-            //             .id = user_id,
-            //             .info_hash = user_info_hash,
-            //         };
-            //         row.owner = new_owner;
-            //     });
-            // }
+            [[eosio::action]]
+            void transfer(uint64_t sneaker_id, uint64_t new_owner_id) {
+                sneakers sneaker_storage(get_self(), get_self().value);
+                auto existing_sneaker = sneaker_storage.find(sneaker_id);
+                check(existing_sneaker != sneaker_storage.end(), "sneaker does not exist!");
+                require_auth(existing_sneaker -> owner);
+                users user_storage(get_self(), get_self().value);
+                auto existing_owner = user_storage.find(new_owner_id);
+                check(existing_owner != user_storage.end(), "new owner does not exist!");
+
+                sneaker_storage.modify(existing_sneaker, get_self(), [&] (auto& row) {
+                    row.owner = existing_owner->eos_name;
+                    row.owner_id = new_owner_id;
+                    row.status = "not new";
+                });
+            }
 
 
         private:
