@@ -81,6 +81,11 @@ namespace eosio {
             }
 
             [[eosio::action]]
+            void emittrace(uint64_t sneaker_id, name claimacc, uint64_t buyer_id, uint64_t seller_id, string type) {
+                
+            }
+
+            [[eosio::action]]
             void issue(name factory, uint64_t factory_id, name toclaim, uint64_t sneaker_id, string sneaker_info_hash) {
                 check(checkfactory(factory, factory_id), "You are not the factory");
                 sneakers storage(get_self(), get_self().value);
@@ -91,11 +96,11 @@ namespace eosio {
                     .owner = toclaim,
                     .status = "new",
                 };
+                emittrace(sneaker_id, toclaim, NULL, NULL, "issue");
                 storage.emplace(get_self(), [&](auto& row) {
                     row = new_sneaker;
                 });
             };
-
 
             [[eosio::action]]
             void transfer(uint64_t sneaker_id, uint64_t new_owner_id) {
@@ -107,10 +112,40 @@ namespace eosio {
                 auto existing_owner = user_storage.find(new_owner_id);
                 check(existing_owner != user_storage.end(), "new owner does not exist!");
 
+                if (existing_sneaker->owner_id == 0) {
+                    emittrace(sneaker_id, existing_owner->eos_name, new_owner_id, NULL, "claim");
+                } else {
+                    emittrace(sneaker_id, name(NULL), new_owner_id, existing_sneaker->owner_id, "resell");
+                }
+
                 sneaker_storage.modify(existing_sneaker, get_self(), [&] (auto& row) {
                     row.owner = existing_owner->eos_name;
                     row.owner_id = new_owner_id;
                     row.status = "not new";
+                });
+            }
+
+            [[eosio::action]]
+            void updatestatus(uint64_t sneaker_id, string status) {
+                sneakers sneaker_storage(get_self(), get_self().value);
+                auto existing_sneaker = sneaker_storage.find(sneaker_id);
+                check(existing_sneaker != sneaker_storage.end(), "sneaker does not exist!");
+                require_auth(existing_sneaker -> owner);
+                sneaker_storage.modify(existing_sneaker, get_self(), [&] (auto& row) {
+                    row.status = status;
+                });
+            }
+
+
+            // insecure, for demo only
+            [[eosio::action]]
+            void markfraud(name factory, uint64_t factory_id, uint64_t sneaker_id) {
+                check(checkfactory(factory, factory_id), "Account not granted permission");
+                sneakers sneaker_storage(get_self(), get_self().value);
+                auto existing_sneaker = sneaker_storage.find(sneaker_id);
+                check(existing_sneaker -> status == "new", "Sneaker has already been in trading");
+                sneaker_storage.modify(existing_sneaker, get_self(), [&] (auto& row) {
+                    row.status = "stolen";
                 });
             }
 
@@ -138,6 +173,8 @@ namespace eosio {
                 uint64_t primary_key()const {
                     return id;
                 }
+
+                uint64_t get_secondary_index() const { return owner_id;}
             };
 
             struct [[eosio::table]] history {
@@ -158,7 +195,13 @@ namespace eosio {
             };
 
             typedef multi_index<"users"_n, user> users;
-            typedef multi_index<"sneakers"_n, sneaker> sneakers;
+            typedef multi_index<"sneakers"_n, sneaker,
+                indexed_by
+                    <
+                        "byownerid"_n,
+                        const_mem_fun<sneaker, uint64_t, &sneaker::get_secondary_index>
+                    >
+                > sneakers;
     };
 }
 

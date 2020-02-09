@@ -33,6 +33,32 @@
             "fields": []
         },
         {
+            "name": "emittrace",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sneaker_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "claimacc",
+                    "type": "name"
+                },
+                {
+                    "name": "buyer_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seller_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "type",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "eraseuser",
             "base": "",
             "fields": [
@@ -101,6 +127,24 @@
             ]
         },
         {
+            "name": "markfraud",
+            "base": "",
+            "fields": [
+                {
+                    "name": "factory",
+                    "type": "name"
+                },
+                {
+                    "name": "factory_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "sneaker_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "ownership",
             "base": "",
             "fields": [
@@ -151,6 +195,20 @@
                 {
                     "name": "new_owner_id",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "updatestatus",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sneaker_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "status",
+                    "type": "string"
                 }
             ]
         },
@@ -217,6 +275,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "emittrace",
+            "type": "emittrace",
+            "ricardian_contract": ""
+        },
+        {
             "name": "eraseuser",
             "type": "eraseuser",
             "ricardian_contract": ""
@@ -232,8 +295,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "markfraud",
+            "type": "markfraud",
+            "ricardian_contract": ""
+        },
+        {
             "name": "transfer",
             "type": "transfer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "updatestatus",
+            "type": "updatestatus",
             "ricardian_contract": ""
         },
         {
