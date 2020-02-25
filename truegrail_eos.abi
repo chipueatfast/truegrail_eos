@@ -33,32 +33,6 @@
             "fields": []
         },
         {
-            "name": "emittrace",
-            "base": "",
-            "fields": [
-                {
-                    "name": "sneaker_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "claimacc",
-                    "type": "name"
-                },
-                {
-                    "name": "buyer_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "seller_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "type",
-                    "type": "string"
-                }
-            ]
-        },
-        {
             "name": "eraseuser",
             "base": "",
             "fields": [
@@ -73,8 +47,32 @@
             "base": "",
             "fields": [
                 {
-                    "name": "tx_hash",
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "trx_id",
                     "type": "checksum256"
+                },
+                {
+                    "name": "sneaker_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "claim_account",
+                    "type": "name"
+                },
+                {
+                    "name": "buyer_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seller_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "transaction_type",
+                    "type": "string"
                 }
             ]
         },
@@ -141,20 +139,6 @@
                 {
                     "name": "sneaker_id",
                     "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "ownership",
-            "base": "",
-            "fields": [
-                {
-                    "name": "sneaker",
-                    "type": "sneaker"
-                },
-                {
-                    "name": "owner",
-                    "type": "user"
                 }
             ]
         },
@@ -275,11 +259,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "emittrace",
-            "type": "emittrace",
-            "ricardian_contract": ""
-        },
-        {
             "name": "eraseuser",
             "type": "eraseuser",
             "ricardian_contract": ""
@@ -317,15 +296,8 @@
     ],
     "tables": [
         {
-            "name": "history",
+            "name": "histories",
             "type": "history",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "ownership",
-            "type": "ownership",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

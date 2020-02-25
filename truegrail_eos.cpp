@@ -1,5 +1,8 @@
 #include <eosio/eosio.hpp>
 #include <eosio/asset.hpp>
+#include <eosio/crypto.hpp>
+#include <eosio/transaction.hpp>
+#include <eosio/multi_index.hpp>
 #include <string>
 
 namespace eosio {
@@ -81,11 +84,6 @@ namespace eosio {
             }
 
             [[eosio::action]]
-            void emittrace(uint64_t sneaker_id, name claimacc, uint64_t buyer_id, uint64_t seller_id, string type) {
-                
-            }
-
-            [[eosio::action]]
             void issue(name factory, uint64_t factory_id, name toclaim, uint64_t sneaker_id, string sneaker_info_hash) {
                 check(checkfactory(factory, factory_id), "You are not the factory");
                 sneakers storage(get_self(), get_self().value);
@@ -96,7 +94,7 @@ namespace eosio {
                     .owner = toclaim,
                     .status = "new",
                 };
-                emittrace(sneaker_id, toclaim, NULL, NULL, "issue");
+                insert_history_trace(sneaker_id, toclaim, NULL, NULL, "issue");
                 storage.emplace(get_self(), [&](auto& row) {
                     row = new_sneaker;
                 });
@@ -113,9 +111,9 @@ namespace eosio {
                 check(existing_owner != user_storage.end(), "new owner does not exist!");
 
                 if (existing_sneaker->owner_id == 0) {
-                    emittrace(sneaker_id, existing_owner->eos_name, new_owner_id, NULL, "claim");
+                    insert_history_trace(sneaker_id, existing_owner->eos_name, new_owner_id, NULL, "claim");
                 } else {
-                    emittrace(sneaker_id, name(NULL), new_owner_id, existing_sneaker->owner_id, "resell");
+                    insert_history_trace(sneaker_id, name(NULL), new_owner_id, existing_sneaker->owner_id, "resell");
                 }
 
                 sneaker_storage.modify(existing_sneaker, get_self(), [&] (auto& row) {
@@ -152,6 +150,34 @@ namespace eosio {
 
         private:
 
+            checksum256 get_trx_id() {
+                size_t size = transaction_size();
+                char buf[size];
+                size_t read = read_transaction( buf, size );
+                check( size == read, "read_transaction failed");
+                return sha256(buf, read);
+            }
+
+            void insert_history_trace(
+                uint64_t sneaker_id,
+                name claimacc, 
+                uint64_t buyer_id, 
+                uint64_t seller_id, 
+                string type
+            ) {
+                histories storage(get_self(), get_self().value);
+                storage.emplace(get_self(), [&](auto& row) {
+                    row.id = storage.available_primary_key();
+                    row.trx_id = get_trx_id();
+                    row.sneaker_id = sneaker_id;
+                    row.claim_account = claimacc;
+                    row.buyer_id = buyer_id;
+                    row.seller_id = seller_id;
+                    row.transaction_type = type;
+                });
+
+            }
+
             struct [[eosio::table]] user {
                 uint64_t id;
                 name eos_name;
@@ -178,30 +204,47 @@ namespace eosio {
             };
 
             struct [[eosio::table]] history {
-                checksum256 tx_hash;
+                uint64_t id;
+                checksum256 trx_id;
+                uint64_t sneaker_id;
+                name claim_account;
+                uint64_t buyer_id;
+                uint64_t seller_id;
+                string transaction_type;
 
-                checksum256 primary_key()const {
-                    return tx_hash;
+                uint64_t primary_key() const {
+                    return id;
                 }
-            };
-
-            struct [[eosio::table]] ownership {
-                sneaker sneaker;
-                user owner;
-
-                uint64_t primary_key()const {
-                    return sneaker.id;
-                };
+                checksum256 get_trx_id_index() const {
+                    return trx_id;
+                }
+                uint64_t get_sneaker_id_index() const {
+                    return sneaker_id;
+                }
             };
 
             typedef multi_index<"users"_n, user> users;
             typedef multi_index<"sneakers"_n, sneaker,
-                indexed_by
+                    indexed_by
                     <
                         "byownerid"_n,
                         const_mem_fun<sneaker, uint64_t, &sneaker::get_secondary_index>
                     >
                 > sneakers;
+            typedef multi_index<
+                        "histories"_n,
+                        history,
+                        indexed_by
+                        <
+                            "bytrxid"_n,
+                            const_mem_fun<history, checksum256, &history::get_trx_id_index>
+                        >,
+                        indexed_by
+                        <
+                            "bysneakerid"_n,
+                            const_mem_fun<history, uint64_t, &history::get_sneaker_id_index>
+                        >
+                    > histories;
     };
 }
 
